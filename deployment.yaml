@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-nifi-deployment
+  labels:
+    app: apache-nifi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apache-nifi
+  template:
+    metadata:
+      labels:
+        app: apache-nifi
+    spec:
+      containers:
+      - name: apache-nifi
+        image: apache/nifi:1.14.0
+        ports:
+        - containerPort: 8443
+
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "3Gi"
+            cpu: "1500m"
+        
+        env:
+          - name: SINGLE_USER_CREDENTIALS_USERNAME
+            value: "admin"
+          - name: SINGLE_USER_CREDENTIALS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: nifi_password
+                name: credentials
